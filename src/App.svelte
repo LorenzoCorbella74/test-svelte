@@ -38,7 +38,7 @@
   let chords = [];
 
   let editMode = false;
-  let updateIndex  = null;
+  let updateIndex = null;
 
   onMount(() => {
     relations.selectedChord = relations.chords[0];
@@ -50,13 +50,14 @@
     let major = Key.majorKey(form.key);
     let all = { major, natural, harmonic, melodic };
     base = all[form.scale];
-    console.log(base);
+	console.log(base);
+	chords = [];
   }
 
   // quando cambia relations.root
   $: {
     let availableScales = base.chordScales.map(e => e.split(" ")[1]);
-    let index = base.scale.findIndex(e => e === relations.root);
+    let index = base.scale.findIndex(e => e === relations.root.toUpperCase());
     relations.chords = Scale.scaleChords(availableScales[index]); // si prendono solo gli accordi della scala
   }
 
@@ -82,13 +83,13 @@
       });
       console.log(newChord);
       if (editMode) {
-		  chords = [
-            ...chords.slice(0, updateIndex),
-            newChord,
-            ...chords.slice(updateIndex+1)
+        chords = [
+          ...chords.slice(0, updateIndex),
+          newChord,
+          ...chords.slice(updateIndex + 1)
         ];
-		editMode = false;
-		updateIndex = null;
+        editMode = false;
+        updateIndex = null;
       } else {
         chords = [...chords, newChord];
       }
@@ -106,8 +107,8 @@
     let chord = chords.find((e, i) => i === index);
     relations.selectedChord = chord.name.substr(chord.tonic.length);
     relations.root = chord.tonic;
-	editMode = true;
-	updateIndex = index;
+    editMode = true;
+    updateIndex = index;
   }
 </script>
 
@@ -148,20 +149,18 @@
     flex: 1;
   }
 
-  .muted{
-	  color: #b6b6b6;
+  .muted {
+    color: #b6b6b6;
   }
 
   .action {
-	  color :#47a01a;
+    color: #47a01a;
   }
 
-  .delete-btn{
-	  cursor:pointer;
-		  font-size: 1.5rem;
-		  font-weight: 600;
-
-
+  .delete-btn {
+    cursor: pointer;
+    font-size: 1.5rem;
+    font-weight: 600;
   }
 
   table {
@@ -202,7 +201,7 @@
       </select>
     </div>
     <div class="col">
-      <h5>Key</h5>
+      <h5>Grades</h5>
       <select bind:value={relations.root}>
         {#each base.scale as key}
           <option value={key}>{key}</option>
