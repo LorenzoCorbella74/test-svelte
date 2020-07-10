@@ -2,7 +2,7 @@
 
 ![test](./test.JPG)
 
-Just a very first test with [SVELTE](https://svelte.dev/) made to study the Harmonic chords relationships
+Just a very first test with the [SVELTE](https://svelte.dev/) framework made to study the Harmonic chords relationships. For a demo check [here](https://lucid-franklin-58cf0d.netlify.app/).
 
 ## Built With
 - HTML5, CSS
