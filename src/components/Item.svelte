@@ -4,12 +4,13 @@
 
   // SVELTE
   import { onMount } from "svelte";
-  import router from "page";
-  export let params;
   import { fade } from "svelte/transition";
 
   // STATE
   import state from "../state.js";
+
+  export let id; // id passato dal componente List
+  import { navigate } from "svelte-routing";
 
   let keys = [
     { label: "C", value: "c" },
@@ -43,14 +44,11 @@
   let editMode = false;
   let updateIndex = null;
 
-  let id; // id passato dal componente List
-
-  onMount(() => {
-    id = /* async () =>  */ params.id;
+  onMount( () => {
     if (id === "new") {
       selectedChord = possibleChords[0];
     } else {
-      let theOne = state.find(e => e.id === Number(id));
+      let theOne = state.get().find(e => e.id === Number(id));
       id = theOne.id;
       key = theOne.key;
       scale = theOne.scale;
@@ -127,14 +125,14 @@
   }
 
   function goHome() {
-    let updateIndex = state.findIndex(e => e.id === id);
+    let updateIndex = state.get().findIndex(e => e.id === id);
     if (updateIndex !== -1) {
-      state[updateIndex] = { id, key, scale, degree, possibleChords, chords };
+      state.update(updateIndex, { id, key, scale, degree, possibleChords, chords });
     } else {
       id = Math.floor(Math.random() * 1234567);
-      state.push({ id, key, scale, degree, possibleChords, chords });
+      state.add({ id, key, scale, degree, possibleChords, chords });
     }
-    router("/");
+    navigate("/");
   }
 </script>
 
@@ -164,19 +162,7 @@
     flex: 1;
   }
 
-  .muted {
-    color: #b6b6b6;
-  }
 
-  .action {
-    color: #47a01a;
-  }
-
-  .delete-btn {
-    cursor: pointer;
-    font-size: 1.5rem;
-    font-weight: 600;
-  }
 
   table {
   }
@@ -193,7 +179,7 @@
     }
   }
 
-  nav{
+  nav {
     margin-bottom: 1rem;
   }
 
@@ -202,98 +188,99 @@
   }
 </style>
 
-<main>
+<div>
 
   <nav>
-    <a href="/">Back</a>
     <a href="#" on:click={goHome}>Save and back</a>
   </nav>
 
-  <div class="row">
-    <div class="col">
-      <h5>Key</h5>
-      <select bind:value={key}>
-        {#each keys as key}
-          <option value={key.value}>{key.label}</option>
-        {/each}
-      </select>
+  <div>
+    <div class="row">
+      <div class="col">
+        <h5>Key</h5>
+        <select bind:value={key}>
+          {#each keys as key}
+            <option value={key.value}>{key.label}</option>
+          {/each}
+        </select>
+      </div>
+      <div class="col">
+        <h5>Scale</h5>
+        <select bind:value={scale}>
+          {#each scales as scale}
+            <option value={scale.value}>{scale.label}</option>
+          {/each}
+        </select>
+      </div>
+      <div class="col">
+        <h5>Grades</h5>
+        <select bind:value={degree}>
+          {#each base.scale as key}
+            <option value={key}>{key}</option>
+          {/each}
+        </select>
+      </div>
+      <div class="col">
+        <h5>Chords</h5>
+        <select bind:value={selectedChord}>
+          {#each possibleChords as chord}
+            <option value={chord}>{chord}</option>
+          {/each}
+        </select>
+      </div>
+      <div class="col btn">
+        <button on:click={save} style="width:100%; cursor:pointer;">
+          {editMode ? 'Update' : 'Add'}
+        </button>
+      </div>
     </div>
-    <div class="col">
-      <h5>Scale</h5>
-      <select bind:value={scale}>
-        {#each scales as scale}
-          <option value={scale.value}>{scale.label}</option>
-        {/each}
-      </select>
-    </div>
-    <div class="col">
-      <h5>Grades</h5>
-      <select bind:value={degree}>
-        {#each base.scale as key}
-          <option value={key}>{key}</option>
-        {/each}
-      </select>
-    </div>
-    <div class="col">
-      <h5>Chords</h5>
-      <select bind:value={selectedChord}>
-        {#each possibleChords as chord}
-          <option value={chord}>{chord}</option>
-        {/each}
-      </select>
-    </div>
-    <div class="col btn">
-      <button on:click={save} style="width:100%; cursor:pointer;">
-        {editMode ? 'Update' : 'Add'}
-      </button>
-    </div>
-  </div>
 
-  <div class="row">
-    <table>
-      <tr>
-        <th>Grades</th>
-        {#each base.grades as grade}
-          <th>{grade}</th>
-        {/each}
-      </tr>
-      <tr>
-        <td>Intervals</td>
-        {#each base.intervals as interval}
-          <td class="muted">{interval}</td>
-        {/each}
-      </tr>
-      <tr>
-        <td>Notes</td>
-        {#each base.scale as note}
-          <td>{note}</td>
-        {/each}
-      </tr>
-    </table>
-  </div>
-
-  <div class="row">
-    <table>
-      {#each chords as chord, index}
-        <tr transition:fade>
-          <td />
-          {#each chord.newIntervals as interval}
+    <div class="row">
+      <table>
+        <tr>
+          <th>Grades</th>
+          {#each base.grades as grade}
+            <th>{grade}</th>
+          {/each}
+        </tr>
+        <tr>
+          <td>Intervals</td>
+          {#each base.intervals as interval}
             <td class="muted">{interval}</td>
           {/each}
         </tr>
-        <tr transition:fade>
-          <td on:click={() => editChord(index)} style="cursor:pointer;">
-            <strong class="action">{chord.name}</strong>
-          </td>
-          {#each chord.newNotes as note}
+        <tr>
+          <td>Notes</td>
+          {#each base.scale as note}
             <td>{note}</td>
           {/each}
-          <td on:click={() => deleteChord(index)} class="action delete-btn">
-            &times;
-          </td>
         </tr>
-      {/each}
-    </table>
+      </table>
+    </div>
+
+    <div class="row">
+      <table>
+        {#each chords as chord, index}
+          <tr>
+            <td />
+            {#each chord.newIntervals as interval}
+              <td class="muted">{interval}</td>
+            {/each}
+          </tr>
+          <tr>
+            <td on:click={() => editChord(index)} style="cursor:pointer;">
+              <strong class="primary">{chord.name}</strong>
+            </td>
+            {#each chord.newNotes as note}
+              <td>{note}</td>
+            {/each}
+            <td on:click={() => deleteChord(index)} class="primary delete-btn">
+              &times;
+            </td>
+          </tr>
+        {/each}
+      </table>
+    </div>
   </div>
 
-</main>
+</div>

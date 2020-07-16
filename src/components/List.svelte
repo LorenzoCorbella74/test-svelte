@@ -3,8 +3,21 @@
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
 
+  import { Link } from "svelte-routing";
+
   // STATE
   import state from "../state.js";
+
+  let list = [];
+
+  onMount(() => {
+    list = state.get();
+  });
+
+  function deleteChord(index) {
+    state.remove(index);
+    list = state.get();
+  }
 </script>
 
 <style>
@@ -14,10 +27,16 @@
   }
   .box {
     width: 24%;
-    padding: 2rem;
+    padding: 1rem;
     margin-bottom: 0.2rem;
     margin-right: 0.2rem;
-    border: 1px solid grey;
+    border: 1px solid #b6b6b6;
+  }
+
+  .flex-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   nav {
@@ -26,15 +45,20 @@
 </style>
 
 <nav>
-  <a href="/item/new">New</a>
+  <Link to="/item/new">New</Link>
 </nav>
 
 <div class="list-container">
-  {#each state as study}
+  {#each list as study, index}
     <div class="box">
-      <a href="/item/{study.id}">
-        <h3>{study.key} {study.scale}</h3>
-      </a>
+      <div class="flex-content">
+        <Link to="/item/{study.id}">
+          <h3>{study.key} {study.scale}</h3>
+        </Link>
+        <span on:click={()=>deleteChord(index)} class="primary delete-btn">
+          &times;
+        </span>
+      </div>
     </div>
   {/each}
 
