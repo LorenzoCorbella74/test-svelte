@@ -2,7 +2,7 @@
 
 ![test](./test.JPG)
 
-Just a very first test with the FE framework [SVELTE](https://svelte.dev/) to develop a web app for studying the harmonic relationships among choosen chords. For a demo check [here](https://lucid-franklin-58cf0d.netlify.app/).
+Just a very first test with the FE framework [SVELTE](https://svelte.dev/) to develop a web app for studying the harmonic relationships among choosen chords. For a demo check [here](https://harmonic-relationships-2020.netlify.app/).
 
 ## Built With
 - HTML5, CSS
